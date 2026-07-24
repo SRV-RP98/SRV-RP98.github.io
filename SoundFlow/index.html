@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08090c" />
+    <meta
+      name="description"
+      content="Connessione sicura al server privato SoundFlow."
+    />
+    <noscript>
+      <meta
+        http-equiv="refresh"
+        content="3; url=https://soundflow-gateway.soundflow.workers.dev"
+      />
+    </noscript>
+    <title>Connessione a SoundFlow</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter, "Segoe UI Variable", "Segoe UI", system-ui, -apple-system,
+          sans-serif;
+        background: #08090c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 320px;
+        min-height: 100%;
+        background: #08090c;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #08090c;
+        color: #f6f8f7;
+      }
+
+      button,
+      a {
+        font: inherit;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      button:focus-visible,
+      a:focus-visible {
+        outline: 2px solid #8bef78;
+        outline-offset: 3px;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .launcher {
+        position: relative;
+        isolation: isolate;
+        display: grid;
+        min-height: 100vh;
+        min-height: 100dvh;
+        place-items: center;
+        overflow: hidden;
+        padding:
+          max(32px, env(safe-area-inset-top))
+          max(24px, env(safe-area-inset-right))
+          max(32px, env(safe-area-inset-bottom))
+          max(24px, env(safe-area-inset-left));
+        background:
+          radial-gradient(
+            circle at 50% 38%,
+            rgba(72, 206, 99, 0.11),
+            transparent 32%
+          ),
+          #08090c;
+        text-align: center;
+      }
+
+      .launcher::before {
+        position: absolute;
+        z-index: -1;
+        width: min(76vw, 520px);
+        aspect-ratio: 1;
+        border: 1px solid rgba(139, 239, 120, 0.05);
+        border-radius: 50%;
+        box-shadow:
+          0 0 90px rgba(72, 206, 99, 0.05),
+          inset 0 0 90px rgba(72, 206, 99, 0.035);
+        content: "";
+      }
+
+      .launcher__content {
+        display: flex;
+        width: min(100%, 380px);
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .launcher__logo-wrap {
+        position: relative;
+        display: grid;
+        width: 116px;
+        height: 116px;
+        place-items: center;
+      }
+
+      .launcher__ring {
+        position: absolute;
+        inset: 0;
+        border: 2px solid rgba(255, 255, 255, 0.07);
+        border-top-color: #8bef78;
+        border-right-color: rgba(72, 206, 99, 0.45);
+        border-radius: 50%;
+        animation: launcher-spin 1.15s linear infinite;
+      }
+
+      .launcher__logo {
+        width: 78px;
+        height: 78px;
+        filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+      }
+
+      .launcher__brand {
+        margin: 25px 0 0;
+        font-size: clamp(28px, 8vw, 36px);
+        font-weight: 750;
+        letter-spacing: -1.4px;
+        line-height: 1;
+      }
+
+      .launcher__brand span {
+        color: #48ce63;
+      }
+
+      .launcher__tagline {
+        margin: 12px 0 0;
+        color: #a6ada9;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+      }
+
+      .launcher__wave {
+        display: flex;
+        height: 30px;
+        align-items: center;
+        gap: 5px;
+        margin-top: 30px;
+      }
+
+      .launcher__wave span {
+        width: 3px;
+        height: 8px;
+        border-radius: 999px;
+        background: #48ce63;
+        box-shadow: 0 0 12px rgba(72, 206, 99, 0.38);
+        animation: launcher-wave 0.9s ease-in-out infinite alternate;
+      }
+
+      .launcher__wave span:nth-child(2),
+      .launcher__wave span:nth-child(6) {
+        animation-delay: -0.6s;
+      }
+
+      .launcher__wave span:nth-child(3),
+      .launcher__wave span:nth-child(5) {
+        animation-delay: -0.3s;
+      }
+
+      .launcher__wave span:nth-child(4) {
+        animation-delay: -0.75s;
+      }
+
+      .launcher__status {
+        min-height: 20px;
+        margin: 10px 0 0;
+        color: #858d88;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .launcher__actions {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .launcher__button {
+        min-width: 132px;
+        min-height: 44px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 11px 18px;
+        background: #151920;
+        color: #f6f8f7;
+        cursor: pointer;
+        font-weight: 680;
+        line-height: 1.25;
+        text-decoration: none;
+        transition:
+          border-color 160ms ease,
+          background 160ms ease,
+          transform 160ms ease;
+      }
+
+      .launcher__button:hover {
+        border-color: rgba(139, 239, 120, 0.42);
+        background: #1b2028;
+        transform: translateY(-1px);
+      }
+
+      .launcher__button--primary {
+        border-color: transparent;
+        background: #48ce63;
+        color: #071008;
+      }
+
+      .launcher__button--primary:hover {
+        border-color: transparent;
+        background: #8bef78;
+      }
+
+      .launcher__noscript {
+        width: min(100%, 380px);
+        margin: 20px 0 0;
+        color: #a6ada9;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .launcher__noscript a {
+        color: #8bef78;
+        font-weight: 680;
+      }
+
+      @keyframes launcher-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes launcher-wave {
+        to {
+          height: 26px;
+          background: #8bef78;
+        }
+      }
+
+      @media (max-width: 390px) {
+        .launcher__actions {
+          flex-direction: column;
+        }
+
+        .launcher__button {
+          width: 100%;
+        }
+      }
+
+      @media (max-height: 440px) and (orientation: landscape) {
+        .launcher {
+          padding-top: max(18px, env(safe-area-inset-top));
+          padding-bottom: max(18px, env(safe-area-inset-bottom));
+        }
+
+        .launcher__logo-wrap {
+          width: 88px;
+          height: 88px;
+        }
+
+        .launcher__logo {
+          width: 58px;
+          height: 58px;
+        }
+
+        .launcher__brand {
+          margin-top: 16px;
+          font-size: 28px;
+        }
+
+        .launcher__tagline {
+          margin-top: 8px;
+        }
+
+        .launcher__wave {
+          margin-top: 15px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .launcher__ring {
+          animation: none;
+          border-color: rgba(72, 206, 99, 0.45);
+          border-top-color: #8bef78;
+        }
+
+        .launcher__wave span {
+          animation: none;
+        }
+
+        .launcher__wave span:nth-child(2),
+        .launcher__wave span:nth-child(6) {
+          height: 14px;
+        }
+
+        .launcher__wave span:nth-child(3),
+        .launcher__wave span:nth-child(5) {
+          height: 20px;
+        }
+
+        .launcher__wave span:nth-child(4) {
+          height: 26px;
+        }
+
+        .launcher__button {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="launcher">
+      <div class="launcher__content">
+        <div class="launcher__logo-wrap" aria-hidden="true">
+          <span class="launcher__ring"></span>
+          <svg
+            class="launcher__logo"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            focusable="false"
+          >
+            <defs>
+              <linearGradient
+                id="launcher-gradient"
+                x1="8"
+                y1="8"
+                x2="56"
+                y2="56"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#8bef78"></stop>
+                <stop offset=".52" stop-color="#48cf63"></stop>
+                <stop offset="1" stop-color="#27ad4e"></stop>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="17" fill="#050606"></rect>
+            <path
+              d="M14 21c9-9 23-10 34-3 3 2 5 4 7 7-9-5-17-6-25-3-4 2-7 4-11 4-3 0-5-2-5-5Z"
+              fill="url(#launcher-gradient)"
+            ></path>
+            <path
+              d="M10 28c7 7 16 8 24 4 8-4 15-3 20 3 1 2 2 4 2 6-8-6-16-7-24-3-8 4-16 2-20-3-2-2-2-5-2-7Z"
+              fill="url(#launcher-gradient)"
+            ></path>
+            <path
+              d="M12 41c8 5 16 5 23 1 7-4 13-2 16 2-6 0-10 2-14 5-8 6-20 3-25-8Z"
+              fill="url(#launcher-gradient)"
+            ></path>
+          </svg>
+        </div>
+
+        <h1 class="launcher__brand">Sound<span>Flow</span></h1>
+        <p class="launcher__tagline">La musica. Senza interruzioni.</p>
+
+        <div class="launcher__wave" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <p
+          id="launcher-status"
+          class="launcher__status"
+          role="status"
+          aria-live="polite"
+        >
+          Connessione al server privato&hellip;
+        </p>
+
+        <div id="launcher-actions" class="launcher__actions" hidden>
+          <button id="launcher-retry" class="launcher__button" type="button">
+            Riprova
+          </button>
+          <a
+            id="launcher-continue"
+            class="launcher__button launcher__button--primary"
+            href="https://soundflow-gateway.soundflow.workers.dev"
+          >
+            Continua
+          </a>
+        </div>
+
+        <noscript>
+          <p class="launcher__noscript">
+            JavaScript non è disponibile. Il collegamento verrà aperto
+            automaticamente; se non succede,
+            <a href="https://soundflow-gateway.soundflow.workers.dev">continua verso SoundFlow</a>.
+          </p>
+        </noscript>
+      </div>
+    </main>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const placeholder = "https://soundflow-gateway.soundflow.workers.dev";
+        const status = document.getElementById("launcher-status");
+        const actions = document.getElementById("launcher-actions");
+        const retry = document.getElementById("launcher-retry");
+        const continueLink = document.getElementById("launcher-continue");
+        let destination;
+        let fallbackTimer;
+
+        const showFallback = (message) => {
+          window.clearTimeout(fallbackTimer);
+          status.textContent = message;
+          actions.hidden = false;
+        };
+
+        const readDestination = () => {
+          if (!placeholder || placeholder.includes("__SOUNDFLOW_")) {
+            throw new Error("Gateway SoundFlow non configurato.");
+          }
+
+          const parsed = new URL(placeholder);
+          if (parsed.protocol !== "https:") {
+            throw new Error("Il gateway SoundFlow deve utilizzare HTTPS.");
+          }
+
+          return parsed.href;
+        };
+
+        const navigate = () => {
+          actions.hidden = true;
+          status.textContent = "Apertura di SoundFlow\u2026";
+
+          try {
+            destination ??= readDestination();
+            continueLink.href = destination;
+            fallbackTimer = window.setTimeout(
+              () =>
+                showFallback(
+                  "La connessione sta impiegando più del previsto.",
+                ),
+              5000,
+            );
+            window.location.replace(destination);
+          } catch (error) {
+            showFallback(
+              error instanceof Error
+                ? error.message
+                : "Non è stato possibile aprire SoundFlow.",
+            );
+          }
+        };
+
+        retry.addEventListener("click", navigate);
+
+        try {
+          destination = readDestination();
+          continueLink.href = destination;
+          window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
+              window.setTimeout(navigate, 180);
+            });
+          });
+        } catch (error) {
+          continueLink.hidden = true;
+          showFallback(
+            error instanceof Error
+              ? error.message
+              : "Gateway SoundFlow non configurato.",
+          );
+        }
+      })();
+    </script>
+  </body>
+</html>
